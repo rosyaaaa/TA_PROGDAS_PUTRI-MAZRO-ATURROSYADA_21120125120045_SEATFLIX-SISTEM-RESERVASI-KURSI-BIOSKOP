@@ -7,18 +7,18 @@ $shows = load_shows();
 if(!isset($shows[$id])) die('Show tidak ditemukan');
 $show = $shows[$id];
 
-// Harga kursi
+
 $seat_price = 50000; 
 $vip_price = 75000;
 
-// Load bookings
+
 $booking_file = __DIR__."/data/bookings.json";
 $bookings = [];
 if(file_exists($booking_file)){
     $bookings = json_decode(file_get_contents($booking_file), true) ?: [];
 }
 
-// tandai kursi yang sudah dipesan
+
 $bookedSeats = [];
 if(isset($bookings[$id])){
     foreach($bookings[$id] as $b){
@@ -100,7 +100,7 @@ let selectedSeats = [];
 const seat_price = <?= $seat_price ?>;
 const vip_price = <?= $vip_price ?>;
 
-// pilih kursi
+
 seats.forEach(seat=>{
     seat.addEventListener('click',()=>{
         if(seat.dataset.taken) return;
@@ -115,22 +115,21 @@ seats.forEach(seat=>{
     });
 });
 
-// tombol Pesan Kursi
+
 bookBtn.addEventListener('click',()=>{
     if(selectedSeats.length===0){
-        alert('Pilih minimal 1 kursi!');
+        alert('Pilih minimal 1 kursi..');
         return;
     }
-    customerNameInput.value='';
+    customerNameInput.value=''
     inputDiv.style.display='block';
     strukDiv.style.display='none';
     popup.style.display='flex';
 });
 
-// tombol batal
+
 document.getElementById('cancelBtn').addEventListener('click',()=>{popup.style.display='none';});
 
-// tombol konfirmasi
 document.getElementById('confirmBtn').addEventListener('click',()=>{
     const name = customerNameInput.value.trim()||'Anonymous';
     let total = 0;
@@ -155,7 +154,6 @@ document.getElementById('confirmBtn').addEventListener('click',()=>{
         });
     });
 
-    // simpan ke bookings.json
     fetch('book_ajax.php',{
         method:'POST',
         headers:{'Content-Type':'application/json'},

@@ -1,12 +1,31 @@
 <?php
 require_once __DIR__ . "/inc/helpers.php";
 
+// pastikan timezone konsisten (jika belum diset di helpers.php)
+date_default_timezone_set('Asia/Jakarta');
+
 $shows = load_shows();
-$booking_file = __DIR__."/data/bookings.json";
+$booking_file = __DIR__ . "/data/bookings.json";
 $bookings = [];
-if(file_exists($booking_file)){
+
+// Load file booking
+if (file_exists($booking_file)) {
     $bookings = json_decode(file_get_contents($booking_file), true) ?: [];
 }
+
+// Gabungkan dan urutkan (terbaru di atas)
+$merged = [];
+foreach ($bookings as $show_id => $list) {
+    foreach ($list as $b) {
+        $b['show_id'] = $show_id;
+        $merged[] = $b;
+    }
+}
+usort($merged, function ($a, $b) {
+    $ta = isset($a['time']) ? strtotime($a['time']) : 0;
+    $tb = isset($b['time']) ? strtotime($b['time']) : 0;
+    return $tb - $ta;
+});
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -28,24 +47,38 @@ h1{color:#e50914;text-align:center;}
 <h1>History Booking</h1>
 
 <?php
-if(empty($bookings)){
+if (empty($merged)) {
     echo "<p>Tidak ada history booking.</p>";
 } else {
-    foreach($bookings as $show_id => $list){
+    foreach ($merged as $b) {
+
+        $show_id = $b['show_id'];
         $title = $shows[$show_id]['title'] ?? "Unknown Film";
-        foreach($list as $b){
-            $seat = $b['seat'] ?? ($b['row'].'-'.$b['col']);
-            $name = $b['name'] ?? "Anonymous";
-            $price = $b['price'] ?? 0;
-            $time = isset($b['time']) ? date('d-m-Y H:i', strtotime($b['time'])) : "Unknown";
-            echo "<div class='card'>";
-            echo "<p><strong>Nama Customer:</strong> $name</p>";
-            echo "<p><strong>Film:</strong> $title</p>";
-            echo "<p><strong>Kursi:</strong> $seat</p>";
-            echo "<p><strong>Jam:</strong> $time</p>";
-            echo "<p><strong>Harga:</strong> Rp ".number_format($price,0,',','.')."</p>";
-            echo "</div>";
+
+        $seat = $b['seat'] ?? ($b['row'].'-'.$b['col']);
+        $name = $b['name'] ?? "Anonymous";
+        $price = $b['price'] ?? 0;
+
+        // Format jam yang sama dengan struk booking (local Asia/Jakarta)
+        if (isset($b['time']) && !empty($b['time'])) {
+            try {
+                $dt = new DateTime($b['time']);
+                $dt->setTimezone(new DateTimeZone('Asia/Jakarta'));
+                $time = $dt->format('d-m-Y H:i:s');
+            } catch (Exception $e) {
+                $time = $b['time'];
+            }
+        } else {
+            $time = "Unknown";
         }
+
+        echo "<div class='card'>";
+        echo "<p><strong>Nama Customer:</strong> $name</p>";
+        echo "<p><strong>Film:</strong> $title</p>";
+        echo "<p><strong>Kursi:</strong> $seat</p>";
+        echo "<p><strong>Jam:</strong> $time</p>";
+        echo "<p><strong>Harga:</strong> Rp ".number_format($price,0,',','.')."</p>";
+        echo "</div>";
     }
 }
 ?>
