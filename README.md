@@ -10,7 +10,7 @@ bioskop_php/
 ├── style.css               → Tampilan $ GUI
 │
 ├── inc/
-│   ├── helpers.php         → File pusat: load/save JSON, create_default_shows(), book_seat(), utilitas seat, is_vip(), dll.
+│   ├── helpers.php         → File pusat
 │
 ├── data/
 │   ├── shows.json          → Data film + kursi + VIP
