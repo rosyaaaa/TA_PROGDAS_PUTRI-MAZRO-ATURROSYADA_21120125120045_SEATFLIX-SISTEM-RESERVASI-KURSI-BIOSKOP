@@ -7,14 +7,14 @@ $shows = load_shows();
 $booking_file = __DIR__ . "/data/bookings.json";
 $bookings = [];
 
-// Load file booking
+// Load file 
 if (file_exists($booking_file)) {
     $bookings = json_decode(file_get_contents($booking_file), true) ?: [];
 }
 
-
-$queue = [];         // queue kosong
-$queueIndex = 0;     // pointer queue (tanpa foreach)
+booking
+$queue = [];         
+$queueIndex = 0;     
 
 foreach ($bookings as $show_id => $list) {
     for ($i = 0; $i < count($list); $i++) {
@@ -31,8 +31,6 @@ for ($i = 0; $i < count($queue); $i++) {
 }
 
 
-
-// ini tetap sama seperti punyamu
 $merged = [];
 for ($i = 0; $i < count($stack); $i++) {
     $b = $stack[$i];
@@ -40,7 +38,7 @@ for ($i = 0; $i < count($stack); $i++) {
     $merged[] = $b;
 }
 
-// urutkan terbaru ke atas — tetap sama
+
 usort($merged, function ($a, $b) {
     $ta = isset($a['time']) ? strtotime($a['time']) : 0;
     $tb = isset($b['time']) ? strtotime($b['time']) : 0;
@@ -67,7 +65,7 @@ h1{color:#e50914;text-align:center;}
 <h1>History Booking</h1>
 
 <?php
-// tampilkan hasil — sama persis dengan punyamu
+
 if (empty($merged)) {
     echo "<p>Tidak ada history booking.</p>";
 } else {
