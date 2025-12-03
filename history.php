@@ -12,7 +12,7 @@ if (file_exists($booking_file)) {
     $bookings = json_decode(file_get_contents($booking_file), true) ?: [];
 }
 
-booking
+
 $queue = [];         
 $queueIndex = 0;     
 
