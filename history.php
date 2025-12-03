@@ -1,7 +1,6 @@
 <?php
 require_once __DIR__ . "/inc/helpers.php";
 
-// pastikan timezone konsisten (jika belum diset di helpers.php)
 date_default_timezone_set('Asia/Jakarta');
 
 $shows = load_shows();
@@ -13,14 +12,35 @@ if (file_exists($booking_file)) {
     $bookings = json_decode(file_get_contents($booking_file), true) ?: [];
 }
 
-// Gabungkan dan urutkan (terbaru di atas)
-$merged = [];
+
+$queue = [];         // queue kosong
+$queueIndex = 0;     // pointer queue (tanpa foreach)
+
 foreach ($bookings as $show_id => $list) {
-    foreach ($list as $b) {
-        $b['show_id'] = $show_id;
-        $merged[] = $b;
+    for ($i = 0; $i < count($list); $i++) {
+        $queue[] = $list[$i];    // enqueue
     }
 }
+
+
+$stack = [];
+$stackTop = 0;
+
+for ($i = 0; $i < count($queue); $i++) {
+    $stack[$stackTop++] = $queue[$i];   // push
+}
+
+
+
+// ini tetap sama seperti punyamu
+$merged = [];
+for ($i = 0; $i < count($stack); $i++) {
+    $b = $stack[$i];
+    $b['show_id'] = array_keys($bookings)[$i] ?? '';
+    $merged[] = $b;
+}
+
+// urutkan terbaru ke atas — tetap sama
 usort($merged, function ($a, $b) {
     $ta = isset($a['time']) ? strtotime($a['time']) : 0;
     $tb = isset($b['time']) ? strtotime($b['time']) : 0;
@@ -47,10 +67,12 @@ h1{color:#e50914;text-align:center;}
 <h1>History Booking</h1>
 
 <?php
+// tampilkan hasil — sama persis dengan punyamu
 if (empty($merged)) {
     echo "<p>Tidak ada history booking.</p>";
 } else {
-    foreach ($merged as $b) {
+    for ($i = 0; $i < count($merged); $i++) {
+        $b = $merged[$i];
 
         $show_id = $b['show_id'];
         $title = $shows[$show_id]['title'] ?? "Unknown Film";
@@ -59,7 +81,6 @@ if (empty($merged)) {
         $name = $b['name'] ?? "Anonymous";
         $price = $b['price'] ?? 0;
 
-        // Format jam yang sama dengan struk booking (local Asia/Jakarta)
         if (isset($b['time']) && !empty($b['time'])) {
             try {
                 $dt = new DateTime($b['time']);

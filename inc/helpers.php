@@ -1,25 +1,19 @@
 <?php
 
-// =========================
-// PATH & FILE INITIALIZER
-// =========================
+
 define("DATA_PATH", __DIR__ . "/../data");
 if (!file_exists(DATA_PATH)) mkdir(DATA_PATH, 0777, true);
 
 $SHOWS_FILE = DATA_PATH . "/shows.json";
 $BOOKINGS_FILE = DATA_PATH . "/bookings.json";
 
-// =========================
-// INITIAL DATA CREATOR
-// =========================
+
 if (!file_exists($SHOWS_FILE)) create_default_shows();
 if (!file_exists($BOOKINGS_FILE)) {
     file_put_contents($BOOKINGS_FILE, json_encode([], JSON_PRETTY_PRINT));
 }
 
-// =========================
-// DEFAULT SHOWS GENERATOR
-// =========================
+
 function create_default_shows()
 {
     $shows = [
@@ -58,9 +52,7 @@ function create_default_shows()
     file_put_contents($SHOWS_FILE, json_encode($shows, JSON_PRETTY_PRINT));
 }
 
-// =========================
-// JSON HELPERS
-// =========================
+
 function json_load($file, $default = null)
 {
     if (!file_exists($file)) return $default;
@@ -73,9 +65,7 @@ function json_save($file, $data)
     return file_put_contents($file, json_encode($data, JSON_PRETTY_PRINT));
 }
 
-// =========================
-// SHOWS & BOOKINGS WRAPPER
-// =========================
+
 function load_shows()
 {
     global $SHOWS_FILE;
@@ -100,9 +90,7 @@ function save_bookings($bookings)
     return json_save($BOOKINGS_FILE, $bookings);
 }
 
-// =========================
-// UTILITY FUNCTIONS
-// =========================
+
 function seat_label($r, $c)
 {
     return chr(65 + $r) . ($c + 1);
@@ -113,9 +101,7 @@ function is_vip($show, $r)
     return $r < ($show["vip_rows"] ?? 0);
 }
 
-// =========================
-// BOOKING LOGIC
-// =========================
+
 function book_seat($show_key, $r, $c, $name = "Anonymous")
 {
     global $SHOWS_FILE, $BOOKINGS_FILE;
@@ -124,14 +110,14 @@ function book_seat($show_key, $r, $c, $name = "Anonymous")
 
     if (!isset($shows[$show_key])) return false;
 
-    // seat already taken
+
     if ($shows[$show_key]["seats"][$r][$c] !== 0) return false;
 
-    // mark as booked
+    
     $shows[$show_key]["seats"][$r][$c] = 1;
     json_save($SHOWS_FILE, $shows);
 
-    // save booking record
+    
     $bookings = json_load($BOOKINGS_FILE, []);
     $bookings[] = [
         "show" => $show_key,

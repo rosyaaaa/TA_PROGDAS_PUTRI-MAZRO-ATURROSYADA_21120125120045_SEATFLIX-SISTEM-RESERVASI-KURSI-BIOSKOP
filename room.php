@@ -20,11 +20,22 @@ if(file_exists($booking_file)){
 
 
 $bookedSeats = [];
-if(isset($bookings[$id])){
-    foreach($bookings[$id] as $b){
-        $bookedSeats[$b['row'].'-'.$b['col']] = true;
+
+if (isset($bookings[$id])) {
+
+    $length = count($bookings[$id]);
+    $i = 0;
+
+    while ($i < $length) {
+        $row = $bookings[$id][$i]['row'];
+        $col = $bookings[$id][$i]['col'];
+
+        $bookedSeats[$row . '-' . $col] = true;
+
+        $i++;
     }
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="id">
